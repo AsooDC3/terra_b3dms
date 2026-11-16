@@ -374,13 +374,20 @@ function handleClick(e) {
   const id = pickBuilding(point);
   
   // التعديل الجديد: فتح الجولة فوراً إذا وجدت
-  if (id) { 
+   if (id) { 
       hideHover(); 
       const b = buildings.find(x => x.id === id);
+      
       if (b && b.tourId && toursData[b.tourId]) {
-          open360(b.tourId, b.name); // فتح 360 مباشرة
+          if (VISITOR_MODE) {
+              // للزوار: فتح الـ 360 مباشرة
+              open360(b.tourId, b.name); 
+          } else {
+              // للمدير: فتح لوحة التفاصيل (عشان تقدر تعدل أو تحذف)
+              openDetails(id); 
+          }
       } else {
-          openDetails(id); // فتح التفاصيل إذا لم توجد جولة
+          openDetails(id); 
       }
       return; 
   }
