@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -6,215 +5,73 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Dora Tour | الجولة الافتراضية للجامعة</title>
 
-<link rel="stylesheet"
-href="https://cesium.com/downloads/cesiumjs/releases/1.133/Build/Cesium/Widgets/widgets.css">
-
+<link rel="stylesheet" href="https://cesium.com/downloads/cesiumjs/releases/1.133/Build/Cesium/Widgets/widgets.css">
 <script src="https://cesium.com/downloads/cesiumjs/releases/1.133/Build/Cesium/Cesium.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<!-- مكتبة Pannellum للصور 360 -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css"/>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js"></script>
 
 <style>
-* {
-  box-sizing: border-box;
-}
-
-html, body, #map {
-  width: 100%;
-  height: 100%;
-  margin: 0;
-  overflow: hidden;
-}
-
-body {
-  font-family: Tahoma, Arial, sans-serif;
-  background: #101820;
-}
-
-#map canvas {
-  outline: none;
-  touch-action: none;
-  cursor: grab;
-}
+* { box-sizing: border-box; }
+html, body, #map { width: 100%; height: 100%; margin: 0; overflow: hidden; }
+body { font-family: Tahoma, Arial, sans-serif; background: #101820; }
+#map canvas { outline: none; touch-action: none; cursor: grab; }
 
 .panel {
-  position: absolute;
-  z-index: 1000;
-  padding: 15px;
-  color: white;
-  background: rgba(13, 35, 55, 0.96);
-  border: 1px solid #ffffff30;
-  border-radius: 12px;
-  box-shadow: 0 8px 28px #0006;
+  position: absolute; z-index: 1000; padding: 15px; color: white;
+  background: rgba(13, 35, 55, 0.96); border: 1px solid #ffffff30;
+  border-radius: 12px; box-shadow: 0 8px 28px #0006;
 }
+#admin { top: 15px; right: 15px; max-width: min(420px, calc(100vw - 30px)); }
+#editor, #details { top: 115px; right: 15px; width: min(370px, calc(100vw - 30px)); max-height: calc(100vh - 135px); overflow-y: auto; display: none; }
+#visitorTitle { display: none; top: 15px; right: 15px; pointer-events: none; }
+#status { bottom: 15px; right: 15px; max-width: min(440px, calc(100vw - 30px)); display: none; font-size: 13px; line-height: 1.8; white-space: pre-wrap; overflow-wrap: anywhere; }
+h3 { margin: 0 0 12px; font-size: 17px; }
+button { background: #168bd1; color: white; border: 0; border-radius: 8px; padding: 9px 12px; margin: 3px; font: inherit; cursor: pointer; }
+button:hover { filter: brightness(1.12); }
+button:disabled { opacity: 0.55; cursor: wait; }
+button.active { background: #159a79; }
+button.secondary { background: #536a7b; }
+button.danger { background: #b33f4a; }
+button.export { background: #16866d; font-weight: bold; }
+input, textarea { display: block; width: 100%; margin: 7px 0 12px; padding: 10px; border: 1px solid #9eb0bd; border-radius: 8px; font: inherit; direction: rtl; }
+textarea { min-height: 110px; resize: vertical; }
+small { display: block; margin-top: 9px; color: #c5d7e5; line-height: 1.8; }
+#fileInput { display: none; }
+#detailsName { color: #6ed0ff; overflow-wrap: anywhere; }
+#detailsText { line-height: 1.9; white-space: pre-wrap; overflow-wrap: anywhere; }
+#hoverCard { position: fixed; z-index: 2000; display: none; pointer-events: none; padding: 10px 15px; max-width: 300px; background: rgba(255, 255, 255, 0.98); color: #15334b; border: 1px solid #d9e8f4; border-radius: 10px; box-shadow: 0 8px 25px #0005; font-size: 15px; font-weight: bold; overflow-wrap: anywhere; }
 
-#admin {
-  top: 15px;
-  right: 15px;
-  max-width: min(420px, calc(100vw - 30px));
-}
-
-#editor, #details {
-  top: 115px;
-  right: 15px;
-  width: min(370px, calc(100vw - 30px));
-  max-height: calc(100vh - 135px);
-  overflow-y: auto;
-  display: none;
-}
-
-#visitorTitle {
-  display: none;
-  top: 15px;
-  right: 15px;
-  pointer-events: none;
-}
-
-#status {
-  bottom: 15px;
-  right: 15px;
-  max-width: min(440px, calc(100vw - 30px));
-  display: none;
-  font-size: 13px;
-  line-height: 1.8;
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
-}
-
-h3 {
-  margin: 0 0 12px;
-  font-size: 17px;
-}
-
-button {
-  background: #168bd1;
-  color: white;
-  border: 0;
-  border-radius: 8px;
-  padding: 9px 12px;
-  margin: 3px;
-  font: inherit;
-  cursor: pointer;
-}
-
-button:hover {
-  filter: brightness(1.12);
-}
-
-button:disabled {
-  opacity: 0.55;
-  cursor: wait;
-}
-
-button.active {
-  background: #159a79;
-}
-
-button.secondary {
-  background: #536a7b;
-}
-
-button.danger {
-  background: #b33f4a;
-}
-
-button.export {
-  background: #16866d;
-  font-weight: bold;
-}
-
-input, textarea {
-  display: block;
-  width: 100%;
-  margin: 7px 0 12px;
-  padding: 10px;
-  border: 1px solid #9eb0bd;
-  border-radius: 8px;
-  font: inherit;
-  direction: rtl;
-}
-
-textarea {
-  min-height: 110px;
-  resize: vertical;
-}
-
-small {
-  display: block;
-  margin-top: 9px;
-  color: #c5d7e5;
-  line-height: 1.8;
-}
-
-#fileInput {
-  display: none;
-}
-
-#detailsName {
-  color: #6ed0ff;
-  overflow-wrap: anywhere;
-}
-
-#detailsText {
-  line-height: 1.9;
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
-}
-
-#hoverCard {
-  position: fixed;
-  z-index: 2000;
-  display: none;
-  pointer-events: none;
-  padding: 10px 15px;
-  max-width: 300px;
-  background: rgba(255, 255, 255, 0.98);
-  color: #15334b;
-  border: 1px solid #d9e8f4;
-  border-radius: 10px;
-  box-shadow: 0 8px 25px #0005;
-  font-size: 15px;
-  font-weight: bold;
-  overflow-wrap: anywhere;
-}
+/* ===== تنسيقات نافذة 360 (Pannellum) ===== */
+.bti-modal-360 { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 99999; display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s ease; }
+.bti-modal-360.is-active { opacity: 1; visibility: visible; }
+.bti-modal-content { width: 90%; max-width: 1100px; height: 75vh; background: transparent; border-radius: 16px; overflow: hidden; position: relative; border: 2px solid #cbb08a; }
+#panorama-container { width: 100%; height: 100%; transform-origin: center center; }
+.bti-modal-close { position: absolute; top: 15px; right: 15px; width: 45px; height: 45px; background: #6b141c; border: 1px solid #8f1d27; border-radius: 50%; color: #ffffff; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 10; transition: all 0.3s ease; }
+.bti-modal-close:hover { background: #8f1d27; transform: rotate(90deg) scale(1.1); }
+.bti-modal-close svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 2.5; }
+.bti-modal-title { position: absolute; bottom: 20px; right: 20px; background: rgba(34, 49, 58, 0.9); color: #ffffff; padding: 10px 20px; border-radius: 8px; font-weight: 800; font-size: 1.1rem; border: 1px solid rgba(255, 255, 255, 0.3); z-index: 10; pointer-events: none; }
+.pnlm-load-box, .pnlm-load-button, .pnlm-info-box { display: none !important; }
+.bti-fixed-nav { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 15px; z-index: 20; }
+.bti-nav-btn { background: rgba(15, 22, 28, 0.85); color: #cbb08a; border: 2px solid #cbb08a; padding: 10px 25px; border-radius: 30px; font-family: inherit; font-size: 0.95rem; font-weight: 800; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.3s ease; box-shadow: 0 5px 15px rgba(0,0,0,0.5); margin: 0; }
+.bti-nav-btn:hover { background: #6b141c; color: #ffffff; border-color: #ffffff; }
+.bti-nav-btn svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2.5; }
 </style>
 </head>
-
 <body>
 
 <div id="map"></div>
 
 <div id="admin" class="panel">
   <h3>Dora Tour — لوحة التحرير</h3>
-
-  <button id="browseBtn" class="active">
-    استعراض
-  </button>
-
-  <button id="addBtn">
-    إضافة مبنى
-  </button>
-
-  <button id="exportBtn" class="export">
-    Export ZIP — نسخة الجامعة
-  </button>
-
-  <button id="jsonBtn" class="secondary">
-    حفظ JSON
-  </button>
-
-  <button id="importBtn" class="secondary">
-    استيراد JSON
-  </button>
-
-  <input
-    id="fileInput"
-    type="file"
-    accept=".json,application/json"
-  >
-
-  <small id="help">
-    مرّر الماوس فوق العلامة لعرض اسم المبنى.
-    اضغط عليها لعرض المعلومات التفصيلية.
-  </small>
+  <button id="browseBtn" class="active">استعراض</button>
+  <button id="addBtn">إضافة مبنى</button>
+  <button id="exportBtn" class="export">Export ZIP — نسخة الجامعة</button>
+  <button id="jsonBtn" class="secondary">حفظ JSON</button>
+  <button id="importBtn" class="secondary">استيراد JSON</button>
+  <input id="fileInput" type="file" accept=".json,application/json">
+  <small id="help">مرّر الماوس فوق العلامة لعرض اسم المبنى. اضغط عليها لعرض التفاصيل.</small>
 </div>
 
 <div id="visitorTitle" class="panel">
@@ -224,60 +81,65 @@ small {
 
 <div id="editor" class="panel">
   <h3 id="editorHeading">إضافة مبنى</h3>
-
   <label>اسم المبنى</label>
-  <input
-    id="buildingName"
-    placeholder="مثال: قسم هندسة المساحة"
-  >
-
+  <input id="buildingName" placeholder="مثال: قسم هندسة المساحة">
   <label>معلومات المبنى</label>
-  <textarea
-    id="buildingDescription"
-    placeholder="اكتب المعلومات التفصيلية"
-  ></textarea>
+  <textarea id="buildingDescription" placeholder="اكتب المعلومات التفصيلية"></textarea>
+  
+  <label>معرف الجولة 360 (اختياري)</label>
+  <input id="buildingTourId" placeholder="مثال: surv أو deanship أو cs">
+  <small style="margin-top:-5px; margin-bottom:10px;">اكتب كود الجولة (cs, mech, chem, elec, surv, deanship).</small>
 
   <button id="saveBtn">حفظ</button>
-  <button id="cancelBtn" class="secondary">
-    إلغاء
-  </button>
+  <button id="cancelBtn" class="secondary">إلغاء</button>
 </div>
 
 <div id="details" class="panel">
   <h3 id="detailsName"></h3>
   <div id="detailsText"></div>
+  
+  <!-- حاوية زر الجولة 360 (ستظهر إذا لم يفتح الـ 360 مباشرة) -->
+  <div id="tourButtonContainer" style="margin-top: 15px; display: none;"></div>
 
   <div style="margin-top:14px">
     <button id="editBtn">تعديل</button>
-    <button id="deleteBtn" class="danger">
-      حذف
-    </button>
-    <button id="closeDetailsBtn" class="secondary">
-      إغلاق
-    </button>
+    <button id="deleteBtn" class="danger">حذف</button>
+    <button id="closeDetailsBtn" class="secondary">إغلاق</button>
   </div>
 </div>
 
 <div id="hoverCard"></div>
 <div id="status" class="panel"></div>
 
+<!-- نافذة 360 المدمجة -->
+<div class="bti-modal-360" id="modal360">
+    <div class="bti-modal-content">
+        <button class="bti-modal-close" id="closeModal">
+            <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+        <div class="bti-modal-title" id="modalTitle">اسم القسم</div>
+        
+        <div class="bti-fixed-nav" id="fixedNav" style="display: none;">
+            <button class="bti-nav-btn" id="btnPrev" style="display: none;">
+                <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg> السابق
+            </button>
+            <button class="bti-nav-btn" id="btnNext">
+                التالي <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            </button>
+        </div>
+
+        <div id="panorama-container"></div>
+    </div>
+</div>
+
 <script>
 (async function () {
-
 "use strict";
 
-// ==========================================
-// وضع الإدارة / وضع الزوار
-// ==========================================
-
 const VISITOR_MODE = true; // DORA_EXPORT_MODE
-
 const $ = id => document.getElementById(id);
-
 const STORAGE_KEY = "DoraTourBuildingsV1";
 const MODEL_URL = "./tileset.json";
-
-// دقة عرض عالية
 const MODEL_QUALITY = 1;
 
 let buildings = [];
@@ -286,14 +148,8 @@ let editingId = null;
 let selectedId = null;
 let pendingPosition = null;
 
-function showStatus(message) {
-  $("status").textContent = message;
-  $("status").style.display = "block";
-}
-
-function hideStatus() {
-  $("status").style.display = "none";
-}
+function showStatus(message) { $("status").textContent = message; $("status").style.display = "block"; }
+function hideStatus() { $("status").style.display = "none"; }
 
 if (VISITOR_MODE) {
   $("admin").style.display = "none";
@@ -303,1599 +159,516 @@ if (VISITOR_MODE) {
   $("visitorTitle").style.display = "block";
 }
 
-// ==========================================
-// 1. إنشاء Cesium
-// ==========================================
-
 const viewer = new Cesium.Viewer("map", {
-  baseLayer: false,
-  terrainProvider:
-    new Cesium.EllipsoidTerrainProvider(),
-  animation: false,
-  timeline: false,
-  geocoder: false,
-  homeButton: false,
-  sceneModePicker: false,
-  baseLayerPicker: false,
-  navigationHelpButton: false,
-  fullscreenButton: false,
-  infoBox: false,
-  selectionIndicator: false,
+  baseLayer: false, terrainProvider: new Cesium.EllipsoidTerrainProvider(),
+  animation: false, timeline: false, geocoder: false, homeButton: false,
+  sceneModePicker: false, baseLayerPicker: false, navigationHelpButton: false,
+  fullscreenButton: false, infoBox: false, selectionIndicator: false,
   requestRenderMode: false
 });
 
 const scene = viewer.scene;
 const camera = viewer.camera;
 const canvas = scene.canvas;
-
 scene.globe.show = false;
-
-scene.backgroundColor =
-  Cesium.Color.fromCssColorString("#101820");
-
+scene.backgroundColor = Cesium.Color.fromCssColorString("#101820");
 scene.highDynamicRange = false;
 scene.fog.enabled = false;
 scene.globe.enableLighting = false;
 
-// ==========================================
-// 2. تحميل النموذج بدقة عالية
-// ==========================================
-
 let tileset;
-
 try {
-
-  showStatus(
-    "جارٍ تحميل النموذج ثلاثي الأبعاد بدقة عالية..."
-  );
-
-  tileset =
-    await Cesium.Cesium3DTileset.fromUrl(
-      MODEL_URL,
-      {
-        maximumScreenSpaceError: MODEL_QUALITY,
-        dynamicScreenSpaceError: false,
-        skipLevelOfDetail: false
-      }
-    );
-
+  showStatus("جارٍ تحميل النموذج ثلاثي الأبعاد بدقة عالية...");
+  tileset = await Cesium.Cesium3DTileset.fromUrl(MODEL_URL, {
+    maximumScreenSpaceError: MODEL_QUALITY,
+    dynamicScreenSpaceError: false,
+    skipLevelOfDetail: false
+  });
   scene.primitives.add(tileset);
-
   await viewer.zoomTo(tileset);
-
 } catch (error) {
-
   console.error(error);
-
-  showStatus(
-    "تعذر تحميل النموذج. تحقق من tileset.json وملفات 3D Tiles."
-  );
-
+  showStatus("تعذر تحميل النموذج. تحقق من tileset.json وملفات 3D Tiles.");
   return;
 }
 
 scene.screenSpaceCameraController.enableInputs = false;
 
-// ==========================================
-// 3. التحكم بالكاميرا
-// ==========================================
-
-const radius = Math.max(
-  tileset.boundingSphere.radius,
-  1
-);
-
-const minDistance = Math.max(
-  radius * 0.002,
-  0.5
-);
-
+const radius = Math.max(tileset.boundingSphere.radius, 1);
+const minDistance = Math.max(radius * 0.002, 0.5);
 const maxDistance = radius * 20;
-
-let target = Cesium.Cartesian3.clone(
-  tileset.boundingSphere.center
-);
-
-let frame =
-  Cesium.Transforms.eastNorthUpToFixedFrame(
-    target
-  );
-
-const inverse =
-  Cesium.Matrix4.inverseTransformation(
-    frame,
-    new Cesium.Matrix4()
-  );
-
-const localStart =
-  Cesium.Matrix4.multiplyByPoint(
-    inverse,
-    camera.positionWC,
-    new Cesium.Cartesian3()
-  );
-
-let distance = Math.max(
-  Cesium.Cartesian3.magnitude(localStart),
-  minDistance
-);
-
-let heading = Math.atan2(
-  localStart.x,
-  -localStart.y
-);
-
-let elevation = Math.asin(
-  Cesium.Math.clamp(
-    localStart.z / distance,
-    -1,
-    1
-  )
-);
+let target = Cesium.Cartesian3.clone(tileset.boundingSphere.center);
+let frame = Cesium.Transforms.eastNorthUpToFixedFrame(target);
+const inverse = Cesium.Matrix4.inverseTransformation(frame, new Cesium.Matrix4());
+const localStart = Cesium.Matrix4.multiplyByPoint(inverse, camera.positionWC, new Cesium.Cartesian3());
+let distance = Math.max(Cesium.Cartesian3.magnitude(localStart), minDistance);
+let heading = Math.atan2(localStart.x, -localStart.y);
+let elevation = Math.asin(Cesium.Math.clamp(localStart.z / distance, -1, 1));
 
 function updateCamera() {
-
-  const horizontal =
-    distance * Math.cos(elevation);
-
-  const local = new Cesium.Cartesian3(
-    horizontal * Math.sin(heading),
-    -horizontal * Math.cos(heading),
-    distance * Math.sin(elevation)
-  );
-
-  const position =
-    Cesium.Matrix4.multiplyByPoint(
-      frame,
-      local,
-      new Cesium.Cartesian3()
-    );
-
-  const direction =
-    Cesium.Cartesian3.normalize(
-      Cesium.Cartesian3.subtract(
-        target,
-        position,
-        new Cesium.Cartesian3()
-      ),
-      new Cesium.Cartesian3()
-    );
-
-  const normal =
-    Cesium.Ellipsoid.WGS84
-      .geodeticSurfaceNormal(
-        target,
-        new Cesium.Cartesian3()
-      );
-
-  const right =
-    Cesium.Cartesian3.cross(
-      direction,
-      normal,
-      new Cesium.Cartesian3()
-    );
-
-  if (
-    Cesium.Cartesian3.magnitude(right) < 1e-8
-  ) return;
-
+  const horizontal = distance * Math.cos(elevation);
+  const local = new Cesium.Cartesian3(horizontal * Math.sin(heading), -horizontal * Math.cos(heading), distance * Math.sin(elevation));
+  const position = Cesium.Matrix4.multiplyByPoint(frame, local, new Cesium.Cartesian3());
+  const direction = Cesium.Cartesian3.normalize(Cesium.Cartesian3.subtract(target, position, new Cesium.Cartesian3()), new Cesium.Cartesian3());
+  const normal = Cesium.Ellipsoid.WGS84.geodeticSurfaceNormal(target, new Cesium.Cartesian3());
+  const right = Cesium.Cartesian3.cross(direction, normal, new Cesium.Cartesian3());
+  if (Cesium.Cartesian3.magnitude(right) < 1e-8) return;
   Cesium.Cartesian3.normalize(right, right);
-
-  const up =
-    Cesium.Cartesian3.normalize(
-      Cesium.Cartesian3.cross(
-        right,
-        direction,
-        new Cesium.Cartesian3()
-      ),
-      new Cesium.Cartesian3()
-    );
-
-  camera.setView({
-    destination: position,
-    orientation: {
-      direction,
-      up
-    }
-  });
-
+  const up = Cesium.Cartesian3.normalize(Cesium.Cartesian3.cross(right, direction, new Cesium.Cartesian3()), new Cesium.Cartesian3());
+  camera.setView({ destination: position, orientation: { direction, up } });
   scene.requestRender();
 }
 
-// ==========================================
-// 4. تصميم علامة المبنى
-// ==========================================
-
 function makeMarker() {
-
   const c = document.createElement("canvas");
-
-  c.width = 96;
-  c.height = 116;
-
+  c.width = 96; c.height = 116;
   const x = c.getContext("2d");
-
-  x.shadowColor = "rgba(0,0,0,.35)";
-  x.shadowBlur = 8;
-  x.shadowOffsetY = 4;
-
+  x.shadowColor = "rgba(0,0,0,.35)"; x.shadowBlur = 8; x.shadowOffsetY = 4;
   x.beginPath();
-
-  x.moveTo(48,109);
-  x.bezierCurveTo(36,91,13,66,13,45);
-  x.bezierCurveTo(13,24,29,9,48,9);
-  x.bezierCurveTo(67,9,83,24,83,45);
-  x.bezierCurveTo(83,66,60,91,48,109);
-
+  x.moveTo(48,109); x.bezierCurveTo(36,91,13,66,13,45); x.bezierCurveTo(13,24,29,9,48,9); x.bezierCurveTo(67,9,83,24,83,45); x.bezierCurveTo(83,66,60,91,48,109);
   x.closePath();
-
-  const gradient =
-    x.createLinearGradient(
-      0,0,96,116
-    );
-
-  gradient.addColorStop(
-    0,
-    "#42c8fa"
-  );
-
-  gradient.addColorStop(
-    1,
-    "#0754a7"
-  );
-
-  x.fillStyle = gradient;
-  x.fill();
-
-  x.shadowColor = "transparent";
-  x.lineWidth = 5;
-  x.strokeStyle = "#ffffff";
-  x.stroke();
-
-  x.beginPath();
-  x.arc(48,44,23,0,Math.PI*2);
+  const gradient = x.createLinearGradient(0,0,96,116);
+  gradient.addColorStop(0, "#42c8fa"); gradient.addColorStop(1, "#0754a7");
+  x.fillStyle = gradient; x.fill();
+  x.shadowColor = "transparent"; x.lineWidth = 5; x.strokeStyle = "#ffffff"; x.stroke();
+  x.beginPath(); x.arc(48,44,23,0,Math.PI*2); x.fillStyle = "#ffffff"; x.fill();
+  x.fillStyle = "#156bb1"; x.fillRect(35,35,26,24); x.fillRect(32,32,32,6);
   x.fillStyle = "#ffffff";
-  x.fill();
-
-  x.fillStyle = "#156bb1";
-  x.fillRect(35,35,26,24);
-  x.fillRect(32,32,32,6);
-
-  x.fillStyle = "#ffffff";
-
-  for (let i=0; i<2; i++) {
-    for (let j=0; j<2; j++) {
-      x.fillRect(
-        40+i*11,
-        40+j*9,
-        5,
-        5
-      );
-    }
-  }
-
+  for (let i=0; i<2; i++) { for (let j=0; j<2; j++) { x.fillRect(40+i*11, 40+j*9, 5, 5); } }
   return c.toDataURL("image/png");
 }
-
 const markerImage = makeMarker();
 
-// ==========================================
-// 5. بيانات المباني
-// ==========================================
-
 function normalize(data) {
-
-  const list = Array.isArray(data)
-    ? data
-    : (
-      data &&
-      Array.isArray(data.buildings)
-        ? data.buildings
-        : []
-    );
-
-  return list.filter(b =>
-    b &&
-    typeof b.id === "string" &&
-    typeof b.name === "string" &&
-    Array.isArray(b.position) &&
-    b.position.length === 3 &&
-    b.position.every(Number.isFinite)
-  ).map(b => ({
+  const list = Array.isArray(data) ? data : (data && Array.isArray(data.buildings) ? data.buildings : []);
+  return list.filter(b => b && typeof b.id === "string" && typeof b.name === "string" && Array.isArray(b.position) && b.position.length === 3 && b.position.every(Number.isFinite))
+  .map(b => ({
     id: b.id,
     name: b.name,
-    description:
-      typeof b.description === "string"
-        ? b.description
-        : "",
+    description: typeof b.description === "string" ? b.description : "",
+    tourId: typeof b.tourId === "string" ? b.tourId : "",
     position: [...b.position]
   }));
 }
 
 function persist() {
-
   if (VISITOR_MODE) return;
-
-  try {
-
-    localStorage.setItem(
-      STORAGE_KEY,
-      JSON.stringify(buildings)
-    );
-
-  } catch (error) {
-
-    console.warn(error);
-
-    showStatus(
-      "تعذر الحفظ المحلي. استخدم زر حفظ JSON."
-    );
-  }
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(buildings)); } catch (error) { console.warn(error); showStatus("تعذر الحفظ المحلي. استخدم زر حفظ JSON."); }
 }
 
-// ==========================================
-// 6. رسم علامات المباني
-// ==========================================
-
 function redraw() {
-
   viewer.entities.removeAll();
-
   for (const b of buildings) {
-
     viewer.entities.add({
       id: "building_" + b.id,
-
-      position:
-        new Cesium.Cartesian3(
-          ...b.position
-        ),
-
+      position: new Cesium.Cartesian3(...b.position),
       billboard: {
-        image: markerImage,
-        width: 40,
-        height: 49,
-
-        verticalOrigin:
-          Cesium.VerticalOrigin.BOTTOM,
-
-        disableDepthTestDistance:
-          Number.POSITIVE_INFINITY,
-
-        scaleByDistance:
-          new Cesium.NearFarScalar(
-            20,
-            1.15,
-            2500,
-            0.65
-          )
+        image: markerImage, width: 40, height: 49,
+        verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+        disableDepthTestDistance: Number.POSITIVE_INFINITY,
+        scaleByDistance: new Cesium.NearFarScalar(20, 1.15, 2500, 0.65)
       }
     });
   }
-
   scene.requestRender();
 }
 
-// ==========================================
-// 7. استعادة أسماء المباني
-// ==========================================
-
-let local = [];
-let remote = [];
-
+let local = []; let remote = [];
 if (!VISITOR_MODE) {
-
-  try {
-
-    local = normalize(
-      JSON.parse(
-        localStorage.getItem(
-          STORAGE_KEY
-        ) || "[]"
-      )
-    );
-
-  } catch (error) {
-    console.warn(error);
-  }
+  try { local = normalize(JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]")); } catch (error) { console.warn(error); }
 }
-
 try {
-
-  const response = await fetch(
-    "./buildings.json",
-    {
-      cache: "no-store"
-    }
-  );
-
-  if (response.ok) {
-    remote = normalize(
-      await response.json()
-    );
-  }
-
-} catch (error) {
-  console.warn(error);
-}
+  const response = await fetch("./buildings.json", { cache: "no-store" });
+  if (response.ok) { remote = normalize(await response.json()); }
+} catch (error) { console.warn(error); }
 
 const merged = new Map();
-
-for (const b of remote) {
-  merged.set(b.id,b);
-}
-
-for (const b of local) {
-  merged.set(b.id,b);
-}
-
+for (const b of remote) merged.set(b.id,b);
+for (const b of local) merged.set(b.id,b);
 buildings = [...merged.values()];
-
 redraw();
 
 if (buildings.length) {
-
-  showStatus(
-    "تم تحميل " +
-    buildings.length +
-    " مبنى بنجاح."
-  );
-
+  showStatus("تم تحميل " + buildings.length + " مبنى بنجاح.");
   setTimeout(hideStatus,4000);
-
 } else {
-
-  showStatus(
-    VISITOR_MODE
-      ? "تعذر العثور على أسماء المباني في buildings.json."
-      : "اختر إضافة مبنى لتسجيل أول مبنى."
-  );
+  showStatus(VISITOR_MODE ? "تعذر العثور على أسماء المباني في buildings.json." : "اختر إضافة مبنى لتسجيل أول مبنى.");
 }
-
-// ==========================================
-// 8. أوضاع العمل
-// ==========================================
 
 function setMode(next) {
-
   if (VISITOR_MODE) return;
-
   mode = next;
-
-  $("browseBtn").classList.toggle(
-    "active",
-    mode === "browse"
-  );
-
-  $("addBtn").classList.toggle(
-    "active",
-    mode === "add"
-  );
-
-  $("help").textContent =
-    mode === "add"
-      ? "اضغط على سطح المبنى لتحديد موقع العلامة."
-      : "مرّر الماوس فوق العلامة لعرض الاسم، واضغط عليها لعرض التفاصيل.";
+  $("browseBtn").classList.toggle("active", mode === "browse");
+  $("addBtn").classList.toggle("active", mode === "add");
+  $("help").textContent = mode === "add" ? "اضغط على سطح المبنى لتحديد موقع العلامة." : "مرّر الماوس فوق العلامة لعرض الاسم، واضغط عليها لعرض التفاصيل.";
 }
 
-function closeEditor() {
-
-  $("editor").style.display = "none";
-
-  editingId = null;
-  pendingPosition = null;
-}
-
-function closeDetails() {
-
-  $("details").style.display = "none";
-  selectedId = null;
-}
+function closeEditor() { $("editor").style.display = "none"; editingId = null; pendingPosition = null; }
+function closeDetails() { $("details").style.display = "none"; selectedId = null; $("tourButtonContainer").style.display = "none"; }
 
 function openEditor(b,position) {
-
   if (VISITOR_MODE) return;
-
   closeDetails();
-
   editingId = b ? b.id : null;
-
-  pendingPosition =
-    position || null;
-
-  $("editorHeading").textContent =
-    b
-      ? "تعديل معلومات المبنى"
-      : "إضافة مبنى";
-
-  $("buildingName").value =
-    b ? b.name : "";
-
-  $("buildingDescription").value =
-    b ? b.description : "";
-
+  pendingPosition = position || null;
+  $("editorHeading").textContent = b ? "تعديل معلومات المبنى" : "إضافة مبنى";
+  $("buildingName").value = b ? b.name : "";
+  $("buildingDescription").value = b ? b.description : "";
+  $("buildingTourId").value = b ? b.tourId : "";
   $("editor").style.display = "block";
-
   $("buildingName").focus();
 }
 
 function openDetails(id) {
-
-  const b = buildings.find(
-    x => x.id === id
-  );
-
+  const b = buildings.find(x => x.id === id);
   if (!b) return;
-
   selectedId = id;
-
-  if (!VISITOR_MODE) {
-    closeEditor();
+  if (!VISITOR_MODE) closeEditor();
+  $("detailsName").textContent = b.name;
+  $("detailsText").textContent = b.description || "لا توجد معلومات إضافية.";
+  
+  const btnContainer = $("tourButtonContainer");
+  if (b.tourId && toursData[b.tourId]) {
+      btnContainer.innerHTML = `<button onclick="open360('${b.tourId}', '${b.name}')" style="background: #cbb08a; color: #000; width: 100%; font-weight: bold; font-size: 16px;">🚪 دخول المبنى (جولة 360)</button>`;
+      btnContainer.style.display = "block";
+  } else {
+      btnContainer.style.display = "none";
   }
-
-  $("detailsName").textContent =
-    b.name;
-
-  $("detailsText").textContent =
-    b.description ||
-    "لا توجد معلومات إضافية.";
-
+  
   $("details").style.display = "block";
 }
-
-$("closeDetailsBtn").onclick =
-  closeDetails;
-
-// ==========================================
-// 9. تحديد علامة المبنى
-// ==========================================
+$("closeDetailsBtn").onclick = closeDetails;
 
 function pickBuilding(point) {
-
   const picked = scene.pick(point);
-
-  if (
-    !Cesium.defined(picked) ||
-    !Cesium.defined(picked.id)
-  ) {
-    return null;
-  }
-
+  if (!Cesium.defined(picked) || !Cesium.defined(picked.id)) return null;
   const entityId = picked.id.id;
-
-  if (
-    typeof entityId !== "string" ||
-    !entityId.startsWith("building_")
-  ) {
-    return null;
-  }
-
-  const id = entityId.slice(
-    "building_".length
-  );
-
-  return buildings.some(
-    b => b.id === id
-  ) ? id : null;
+  if (typeof entityId !== "string" || !entityId.startsWith("building_")) return null;
+  const id = entityId.slice("building_".length);
+  return buildings.some(b => b.id === id) ? id : null;
 }
 
-// ==========================================
-// 10. الاسم عند مرور الماوس
-// ==========================================
-
-let activeButton = -1;
-
-let lastX = 0;
-let lastY = 0;
-
-let downX = 0;
-let downY = 0;
-
-let dragged = false;
-
-function hideHover() {
-  $("hoverCard").style.display = "none";
-}
+let activeButton = -1, lastX = 0, lastY = 0, downX = 0, downY = 0, dragged = false;
+function hideHover() { $("hoverCard").style.display = "none"; }
 
 function updateHover(e) {
-
-  if (activeButton !== -1) {
-    hideHover();
-    return;
-  }
-
-  const r =
-    canvas.getBoundingClientRect();
-
-  const point =
-    new Cesium.Cartesian2(
-      e.clientX-r.left,
-      e.clientY-r.top
-    );
-
+  if (activeButton !== -1) { hideHover(); return; }
+  const r = canvas.getBoundingClientRect();
+  const point = new Cesium.Cartesian2(e.clientX-r.left, e.clientY-r.top);
   const id = pickBuilding(point);
-
-  if (!id) {
-
-    hideHover();
-
-    canvas.style.cursor =
-      mode === "add"
-        ? "crosshair"
-        : "grab";
-
-    return;
-  }
-
-  const b = buildings.find(
-    x => x.id === id
-  );
-
+  if (!id) { hideHover(); canvas.style.cursor = mode === "add" ? "crosshair" : "grab"; return; }
+  const b = buildings.find(x => x.id === id);
   if (!b) return;
-
   const card = $("hoverCard");
-
-  card.textContent = b.name;
-  card.style.display = "block";
-
-  let left = e.clientX + 18;
-  let top = e.clientY - 48;
-
-  if (
-    left + card.offsetWidth >
-    window.innerWidth - 12
-  ) {
-
-    left =
-      e.clientX -
-      card.offsetWidth -
-      18;
-  }
-
-  if (top < 12) {
-    top = e.clientY + 20;
-  }
-
-  card.style.left =
-    Math.max(12,left) + "px";
-
-  card.style.top =
-    Math.max(12,top) + "px";
-
+  card.textContent = b.name; card.style.display = "block";
+  let left = e.clientX + 18; let top = e.clientY - 48;
+  if (left + card.offsetWidth > window.innerWidth - 12) left = e.clientX - card.offsetWidth - 18;
+  if (top < 12) top = e.clientY + 20;
+  card.style.left = Math.max(12,left) + "px"; card.style.top = Math.max(12,top) + "px";
   canvas.style.cursor = "pointer";
 }
 
-// ==========================================
-// 11. الضغط على المبنى
-// ==========================================
-
 function handleClick(e) {
-
-  const r =
-    canvas.getBoundingClientRect();
-
-  const point =
-    new Cesium.Cartesian2(
-      e.clientX-r.left,
-      e.clientY-r.top
-    );
-
+  const r = canvas.getBoundingClientRect();
+  const point = new Cesium.Cartesian2(e.clientX-r.left, e.clientY-r.top);
   const id = pickBuilding(point);
-
-  if (id) {
-
-    hideHover();
-    openDetails(id);
-    return;
+  
+  // التعديل الجديد: فتح الجولة فوراً إذا وجدت
+  if (id) { 
+      hideHover(); 
+      const b = buildings.find(x => x.id === id);
+      if (b && b.tourId && toursData[b.tourId]) {
+          open360(b.tourId, b.name); // فتح 360 مباشرة
+      } else {
+          openDetails(id); // فتح التفاصيل إذا لم توجد جولة
+      }
+      return; 
   }
 
-  if (
-    mode === "add" &&
-    !VISITOR_MODE
-  ) {
-
-    if (!scene.pickPositionSupported) {
-
-      showStatus(
-        "المتصفح لا يدعم تحديد موضع المبنى."
-      );
-
-      return;
-    }
-
-    const picked =
-      scene.pick(point);
-
-    if (!Cesium.defined(picked)) {
-
-      showStatus(
-        "اضغط على سطح أحد المباني."
-      );
-
-      return;
-    }
-
-    const pos =
-      scene.pickPosition(point);
-
-    if (!Cesium.defined(pos)) {
-
-      showStatus(
-        "تعذر تحديد الموقع. جرّب نقطة أخرى."
-      );
-
-      return;
-    }
-
-    openEditor(
-      null,
-      [pos.x,pos.y,pos.z]
-    );
-
-  } else {
-
-    closeDetails();
-  }
+  if (mode === "add" && !VISITOR_MODE) {
+    if (!scene.pickPositionSupported) { showStatus("المتصفح لا يدعم تحديد موضع المبنى."); return; }
+    const picked = scene.pick(point);
+    if (!Cesium.defined(picked)) { showStatus("اضغط على سطح أحد المباني."); return; }
+    const pos = scene.pickPosition(point);
+    if (!Cesium.defined(pos)) { showStatus("تعذر تحديد الموقع. جرّب نقطة أخرى."); return; }
+    openEditor(null, [pos.x,pos.y,pos.z]);
+  } else { closeDetails(); }
 }
 
-// ==========================================
-// 12. أدوات الإدارة
-// ==========================================
-
 if (!VISITOR_MODE) {
-
-  $("browseBtn").onclick = () => {
-
-    setMode("browse");
-    closeEditor();
-  };
-
-  $("addBtn").onclick = () => {
-
-    setMode("add");
-    closeEditor();
-    closeDetails();
-    hideHover();
-
-    showStatus(
-      "اضغط على المبنى المطلوب ثم اكتب اسمه."
-    );
-  };
-
+  $("browseBtn").onclick = () => { setMode("browse"); closeEditor(); };
+  $("addBtn").onclick = () => { setMode("add"); closeEditor(); closeDetails(); hideHover(); showStatus("اضغط على المبنى المطلوب ثم اكتب اسمه."); };
+  
   $("saveBtn").onclick = () => {
-
-    const name =
-      $("buildingName").value.trim();
-
-    const description =
-      $("buildingDescription").value.trim();
-
-    if (!name) {
-
-      alert(
-        "يرجى كتابة اسم المبنى."
-      );
-
-      return;
-    }
-
+    const name = $("buildingName").value.trim();
+    const description = $("buildingDescription").value.trim();
+    const tourId = $("buildingTourId").value.trim();
+    if (!name) { alert("يرجى كتابة اسم المبنى."); return; }
     if (editingId) {
-
-      const b = buildings.find(
-        x => x.id === editingId
-      );
-
-      if (b) {
-
-        b.name = name;
-        b.description = description;
-      }
-
+      const b = buildings.find(x => x.id === editingId);
+      if (b) { b.name = name; b.description = description; b.tourId = tourId; }
     } else {
-
-      if (!pendingPosition) {
-
-        alert(
-          "حدد موقع المبنى أولاً."
-        );
-
-        return;
-      }
-
-      const id =
-        "b_" +
-        Date.now() +
-        "_" +
-        Math.random()
-          .toString(36)
-          .slice(2,8);
-
-      buildings.push({
-        id,
-        name,
-        description,
-        position: pendingPosition
-      });
+      if (!pendingPosition) { alert("حدد موقع المبنى أولاً."); return; }
+      const id = "b_" + Date.now() + "_" + Math.random().toString(36).slice(2,8);
+      buildings.push({ id, name, description, tourId, position: pendingPosition });
     }
-
-    persist();
-    redraw();
-    closeEditor();
-    setMode("browse");
-
-    showStatus(
-      "تم حفظ المبنى بنجاح."
-    );
+    persist(); redraw(); closeEditor(); setMode("browse"); showStatus("تم حفظ المبنى بنجاح.");
   };
-
-  $("cancelBtn").onclick = () => {
-
-    closeEditor();
-    setMode("browse");
-  };
-
-  $("editBtn").onclick = () => {
-
-    const b = buildings.find(
-      x => x.id === selectedId
-    );
-
-    if (b) {
-      openEditor(b,null);
-    }
-  };
-
+  $("cancelBtn").onclick = () => { closeEditor(); setMode("browse"); };
+  $("editBtn").onclick = () => { const b = buildings.find(x => x.id === selectedId); if (b) openEditor(b,null); };
   $("deleteBtn").onclick = () => {
-
-    const b = buildings.find(
-      x => x.id === selectedId
-    );
-
+    const b = buildings.find(x => x.id === selectedId);
     if (!b) return;
-
-    if (!confirm(
-      "هل تريد حذف علامة " +
-      b.name +
-      "؟"
-    )) return;
-
-    buildings = buildings.filter(
-      x => x.id !== b.id
-    );
-
-    persist();
-    redraw();
-    closeDetails();
-
-    showStatus(
-      "تم حذف العلامة."
-    );
+    if (!confirm("هل تريد حذف علامة " + b.name + "؟")) return;
+    buildings = buildings.filter(x => x.id !== b.id);
+    persist(); redraw(); closeDetails(); showStatus("تم حذف العلامة.");
   };
-
-  // ======================================
-  // 13. تنزيل الملفات
-  // ======================================
 
   function downloadBlob(blob,name) {
-
-    const url =
-      URL.createObjectURL(blob);
-
-    const a =
-      document.createElement("a");
-
-    a.href = url;
-    a.download = name;
-
-    document.body.appendChild(a);
-
-    a.click();
-    a.remove();
-
-    setTimeout(
-      () => URL.revokeObjectURL(url),
-      120000
-    );
+    const url = URL.createObjectURL(blob); const a = document.createElement("a");
+    a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 120000);
   }
-
   $("jsonBtn").onclick = () => {
-
-    const content =
-      JSON.stringify(
-        {
-          version:1,
-          buildings
-        },
-        null,
-        2
-      );
-
-    downloadBlob(
-      new Blob(
-        [content],
-        {
-          type:
-            "application/json;charset=utf-8"
-        }
-      ),
-      "buildings.json"
-    );
-
-    showStatus(
-      "تم تنزيل buildings.json."
-    );
+    const content = JSON.stringify({ version:1, buildings }, null, 2);
+    downloadBlob(new Blob([content], { type: "application/json;charset=utf-8" }), "buildings.json");
+    showStatus("تم تنزيل buildings.json.");
   };
 
-  // ======================================
-  // 14. استيراد JSON
-  // ======================================
-
-  $("importBtn").onclick = () => {
-
-    $("fileInput").click();
-  };
-
+  $("importBtn").onclick = () => { $("fileInput").click(); };
   $("fileInput").onchange = async e => {
-
-    const file =
-      e.target.files[0];
-
-    if (!file) return;
-
+    const file = e.target.files[0]; if (!file) return;
     try {
-
-      const imported =
-        normalize(
-          JSON.parse(
-            await file.text()
-          )
-        );
-
-      if (!imported.length) {
-
-        throw new Error(
-          "الملف لا يحتوي على مبانٍ صالحة."
-        );
-      }
-
-      const map = new Map(
-        buildings.map(
-          b => [b.id,b]
-        )
-      );
-
-      for (const b of imported) {
-
-        map.set(b.id,b);
-      }
-
-      buildings =
-        [...map.values()];
-
-      persist();
-      redraw();
-
-      showStatus(
-        "تم استيراد " +
-        imported.length +
-        " مبنى."
-      );
-
-    } catch (error) {
-
-      alert(
-        "تعذر الاستيراد: " +
-        error.message
-      );
-    }
-
+      const imported = normalize(JSON.parse(await file.text()));
+      if (!imported.length) throw new Error("الملف لا يحتوي على مبانٍ صالحة.");
+      const map = new Map(buildings.map(b => [b.id,b]));
+      for (const b of imported) map.set(b.id,b);
+      buildings = [...map.values()];
+      persist(); redraw(); showStatus("تم استيراد " + imported.length + " مبنى.");
+    } catch (error) { alert("تعذر الاستيراد: " + error.message); }
     e.target.value = "";
   };
 
-  // ======================================
-  // 15. تصدير ZIP الكامل
-  // ======================================
-
   $("exportBtn").onclick = async () => {
-
     const button = $("exportBtn");
-
-    if (typeof JSZip === "undefined") {
-
-      alert(
-        "مكتبة ZIP غير متاحة. تحقق من الإنترنت."
-      );
-
-      return;
-    }
-
-    if (!window.showDirectoryPicker) {
-
-      alert(
-        "استخدم Chrome أو Edge حديثاً عبر localhost أو HTTPS."
-      );
-
-      return;
-    }
-
+    if (typeof JSZip === "undefined") { alert("مكتبة ZIP غير متاحة. تحقق من الإنترنت."); return; }
+    if (!window.showDirectoryPicker) { alert("استخدم Chrome أو Edge حديثاً عبر localhost أو HTTPS."); return; }
     button.disabled = true;
-
     try {
-
-      showStatus(
-        "اختر مجلد Dora Tour الأصلي الذي يحتوي على tileset.json."
-      );
-
-      const folder =
-        await window.showDirectoryPicker({
-          mode:"read"
-        });
-
-      // التحقق من الملف الرئيسي
-      try {
-
-        const tilesetHandle =
-          await folder.getFileHandle(
-            "tileset.json"
-          );
-
-        await tilesetHandle.getFile();
-
-      } catch (error) {
-
-        throw new Error(
-          "لم يتم العثور على tileset.json في المجلد المختار."
-        );
-      }
-
-      // قراءة صفحة الإدارة
-      const response = await fetch(
-        location.href,
-        {
-          cache:"no-store"
-        }
-      );
-
-      if (!response.ok) {
-
-        throw new Error(
-          "تعذر قراءة index.html."
-        );
-      }
-
-      const source =
-        await response.text();
-
-      const adminFlag =
-        "const VISITOR_MODE = false; // DORA_EXPORT_MODE";
-
-      const visitorFlag =
-        "const VISITOR_MODE = true; // DORA_EXPORT_MODE";
-
-      if (!source.includes(adminFlag)) {
-
-        throw new Error(
-          "تعذر العثور على إعداد نسخة الزوار."
-        );
-      }
-
-      // إنشاء صفحة الزوار
-      const visitorHTML =
-        source.replace(
-          adminFlag,
-          visitorFlag
-        );
-
-      const zip =
-        new JSZip();
-
-      zip.file(
-        "index.html",
-        visitorHTML
-      );
-
-      // تصدير الأسماء الحالية
-      zip.file(
-        "buildings.json",
-        JSON.stringify(
-          {
-            version:1,
-            buildings
-          },
-          null,
-          2
-        )
-      );
-
-      // ==================================
-      // جمع ملفات النموذج
-      // ==================================
-
+      showStatus("اختر مجلد Dora Tour الأصلي الذي يحتوي على tileset.json.");
+      const folder = await window.showDirectoryPicker({ mode:"read" });
+      try { const tilesetHandle = await folder.getFileHandle("tileset.json"); await tilesetHandle.getFile(); } catch (error) { throw new Error("لم يتم العثور على tileset.json في المجلد المختار."); }
+      const response = await fetch(location.href, { cache:"no-store" });
+      if (!response.ok) { throw new Error("تعذر قراءة index.html."); }
+      const source = await response.text();
+      const adminFlag = "const VISITOR_MODE = false; // DORA_EXPORT_MODE";
+      const visitorFlag = "const VISITOR_MODE = true; // DORA_EXPORT_MODE";
+      if (!source.includes(adminFlag)) { throw new Error("تعذر العثور على إعداد نسخة الزوار."); }
+      const visitorHTML = source.replace(adminFlag, visitorFlag);
+      const zip = new JSZip();
+      zip.file("index.html", visitorHTML);
+      zip.file("buildings.json", JSON.stringify({ version:1, buildings }, null, 2));
+      
       const entries = [];
-
-      async function scanDirectory(
-        directory,
-        prefix = ""
-      ) {
-
-        for await (
-          const [name,handle]
-          of directory.entries()
-        ) {
-
-          if (
-            name.startsWith(".")
-          ) continue;
-
-          const path =
-            prefix + name;
-
-          if (
-            handle.kind === "directory"
-          ) {
-
-            await scanDirectory(
-              handle,
-              path + "/"
-            );
-
-          } else {
-
-            if (
-              path === "index.html" ||
-              path === "buildings.json" ||
-              /\.zip$/i.test(name)
-            ) {
-              continue;
-            }
-
-            entries.push({
-              path,
-              handle
-            });
-          }
+      async function scanDirectory(directory, prefix = "") {
+        for await (const [name,handle] of directory.entries()) {
+          if (name.startsWith(".")) continue;
+          const path = prefix + name;
+          if (handle.kind === "directory") { await scanDirectory(handle, path + "/"); } 
+          else { if (path === "index.html" || path === "buildings.json" || /\.zip$/i.test(name)) continue; entries.push({ path, handle }); }
         }
       }
-
-      showStatus(
-        "جارٍ فحص ملفات المشروع..."
-      );
-
+      showStatus("جارٍ فحص ملفات المشروع...");
       await scanDirectory(folder);
-
-      if (
-        !entries.some(
-          item =>
-            item.path === "tileset.json"
-        )
-      ) {
-
-        throw new Error(
-          "ملف tileset.json غير موجود."
-        );
+      if (!entries.some(item => item.path === "tileset.json")) { throw new Error("ملف tileset.json غير موجود."); }
+      
+      let totalSize = 0; const validFiles = []; const failedFiles = [];
+      for (let i=0; i<entries.length; i++) {
+        const entry = entries[i];
+        try { const file = await entry.handle.getFile(); totalSize += file.size; validFiles.push({ path:entry.path, file }); } 
+        catch (error) { console.error("تعذر الوصول إلى الملف:", entry.path, error); failedFiles.push(entry.path); }
+        if (i % 10 === 0) { showStatus("فحص الملفات: " + (i+1) + " / " + entries.length); }
       }
-
-      // ==================================
-      // قراءة الملفات والتحقق منها
-      // ==================================
-
-      let totalSize = 0;
-
-      const validFiles = [];
-      const failedFiles = [];
-
-      for (
-        let i=0;
-        i<entries.length;
-        i++
-      ) {
-
-        const entry =
-          entries[i];
-
-        try {
-
-          const file =
-            await entry.handle.getFile();
-
-          totalSize += file.size;
-
-          validFiles.push({
-            path:entry.path,
-            file
-          });
-
-        } catch (error) {
-
-          console.error(
-            "تعذر الوصول إلى الملف:",
-            entry.path,
-            error
-          );
-
-          failedFiles.push(
-            entry.path
-          );
-        }
-
-        if (
-          i % 10 === 0
-        ) {
-
-          showStatus(
-            "فحص الملفات: " +
-            (i+1) +
-            " / " +
-            entries.length
-          );
-        }
+      if (failedFiles.length > 0) { throw new Error("تعذر الوصول إلى " + failedFiles.length + " ملف:\n" + failedFiles.slice(0,10).join("\n") + "\nتحقق من وجود الملفات محلياً."); }
+      
+      const sizeGB = totalSize / (1024**3);
+      const proceed = confirm("عدد ملفات المشروع: " + validFiles.length + "\nالحجم الإجمالي: " + sizeGB.toFixed(2) + " GB" + "\n\nسيتم إنشاء ZIP كامل دون تقليل دقة النموذج." + "\nقد تحتاج العملية إلى ذاكرة كبيرة." + "\n\nهل تريد المتابعة؟");
+      if (!proceed) { showStatus("تم إلغاء التصدير."); return; }
+      
+      for (let i=0; i<validFiles.length; i++) {
+        const item = validFiles[i];
+        zip.file(item.path, item.file, { binary:true, compression:"STORE" });
+        if (i % 20 === 0) { showStatus("إضافة الملفات: " + (i+1) + " / " + validFiles.length); }
       }
-
-      if (
-        failedFiles.length > 0
-      ) {
-
-        throw new Error(
-          "تعذر الوصول إلى " +
-          failedFiles.length +
-          " ملف:\n" +
-          failedFiles
-            .slice(0,10)
-            .join("\n") +
-          "\nتحقق من وجود الملفات محلياً."
-        );
-      }
-
-      // ==================================
-      // تأكيد الحجم
-      // ==================================
-
-      const sizeGB =
-        totalSize /
-        (1024**3);
-
-      const proceed =
-        confirm(
-          "عدد ملفات المشروع: " +
-          validFiles.length +
-          "\nالحجم الإجمالي: " +
-          sizeGB.toFixed(2) +
-          " GB" +
-          "\n\nسيتم إنشاء ZIP كامل دون تقليل دقة النموذج." +
-          "\nقد تحتاج العملية إلى ذاكرة كبيرة." +
-          "\n\nهل تريد المتابعة؟"
-        );
-
-      if (!proceed) {
-
-        showStatus(
-          "تم إلغاء التصدير."
-        );
-
-        return;
-      }
-
-      // ==================================
-      // إضافة الملفات إلى ZIP
-      // ==================================
-
-      for (
-        let i=0;
-        i<validFiles.length;
-        i++
-      ) {
-
-        const item =
-          validFiles[i];
-
-        zip.file(
-          item.path,
-          item.file,
-          {
-            binary:true,
-            compression:"STORE"
-          }
-        );
-
-        if (
-          i % 20 === 0
-        ) {
-
-          showStatus(
-            "إضافة الملفات: " +
-            (i+1) +
-            " / " +
-            validFiles.length
-          );
-        }
-      }
-
-      // ==================================
-      // إنشاء ZIP
-      // ==================================
-
-      showStatus(
-        "جارٍ إنشاء ZIP. لا تغلق الصفحة."
-      );
-
-      const blob =
-        await zip.generateAsync(
-          {
-            type:"blob",
-            compression:"STORE",
-            streamFiles:true
-          },
-          metadata => {
-
-            showStatus(
-              "إنشاء ZIP: " +
-              Math.round(
-                metadata.percent
-              ) +
-              "%"
-            );
-          }
-        );
-
-      // ==================================
-      // تنزيل ZIP
-      // ==================================
-
-      downloadBlob(
-        blob,
-        "Dora_Tour_University_Visitor.zip"
-      );
-
-      showStatus(
-        "تم تجهيز ملف ZIP وبدء تنزيله. تحقق من اكتمال التنزيل."
-      );
-
+      
+      showStatus("جارٍ إنشاء ZIP. لا تغلق الصفحة.");
+      const blob = await zip.generateAsync({ type:"blob", compression:"STORE", streamFiles:true }, metadata => { showStatus("إنشاء ZIP: " + Math.round(metadata.percent) + "%"); });
+      downloadBlob(blob, "Dora_Tour_University_Visitor.zip");
+      showStatus("تم تجهيز ملف ZIP وبدء تنزيله. تحقق من اكتمال التنزيل.");
     } catch (error) {
-
-      if (
-        error.name !== "AbortError"
-      ) {
-
-        console.error(error);
-
-        showStatus(
-          "تعذر التصدير:\n" +
-          error.message
-        );
-
-        alert(
-          "فشل تصدير المشروع:\n\n" +
-          error.message
-        );
-      }
-
-    } finally {
-
-      button.disabled = false;
-    }
+      if (error.name !== "AbortError") { console.error(error); showStatus("تعذر التصدير:\n" + error.message); alert("فشل تصدير المشروع:\n\n" + error.message); }
+    } finally { button.disabled = false; }
   };
 }
 
-// ==========================================
-// 16. التحكم بالماوس
-// ==========================================
-
-canvas.addEventListener(
-  "pointerdown",
-  e => {
-
-    if (
-      e.button > 2
-    ) return;
-
-    activeButton =
-      e.button;
-
-    lastX =
-      downX =
-      e.clientX;
-
-    lastY =
-      downY =
-      e.clientY;
-
-    dragged = false;
-
-    hideHover();
-
-    canvas.setPointerCapture(
-      e.pointerId
-    );
-
-    e.preventDefault();
+canvas.addEventListener("pointerdown", e => {
+  if (e.button > 2) return;
+  activeButton = e.button; lastX = downX = e.clientX; lastY = downY = e.clientY; dragged = false; hideHover();
+  canvas.setPointerCapture(e.pointerId); e.preventDefault();
+});
+canvas.addEventListener("pointermove", e => {
+  if (activeButton === -1) { updateHover(e); return; }
+  const dx = e.clientX-lastX; const dy = e.clientY-lastY;
+  lastX = e.clientX; lastY = e.clientY;
+  if (Math.hypot(e.clientX-downX, e.clientY-downY) > 5) dragged = true;
+  if (!dragged) return;
+  if (activeButton === 0) {
+    heading -= dx*.005;
+    elevation = Cesium.Math.clamp(elevation+dy*.005, Cesium.Math.toRadians(2), Cesium.Math.toRadians(89));
+  } else if (activeButton === 1 || activeButton === 2) {
+    const scale = distance*.0015;
+    const moveRight = Cesium.Cartesian3.multiplyByScalar(camera.rightWC, -dx*scale, new Cesium.Cartesian3());
+    const moveUp = Cesium.Cartesian3.multiplyByScalar(camera.upWC, dy*scale, new Cesium.Cartesian3());
+    Cesium.Cartesian3.add(target, Cesium.Cartesian3.add(moveRight, moveUp, new Cesium.Cartesian3()), target);
+    frame = Cesium.Transforms.eastNorthUpToFixedFrame(target);
   }
-);
-
-canvas.addEventListener(
-  "pointermove",
-  e => {
-
-    if (
-      activeButton === -1
-    ) {
-
-      updateHover(e);
-      return;
-    }
-
-    const dx =
-      e.clientX-lastX;
-
-    const dy =
-      e.clientY-lastY;
-
-    lastX = e.clientX;
-    lastY = e.clientY;
-
-    if (
-      Math.hypot(
-        e.clientX-downX,
-        e.clientY-downY
-      ) > 5
-    ) {
-
-      dragged = true;
-    }
-
-    if (
-      !dragged
-    ) return;
-
-    if (
-      activeButton === 0
-    ) {
-
-      heading -= dx*.005;
-
-      elevation =
-        Cesium.Math.clamp(
-          elevation+dy*.005,
-          Cesium.Math.toRadians(2),
-          Cesium.Math.toRadians(89)
-        );
-
-    } else if (
-      activeButton === 1 ||
-      activeButton === 2
-    ) {
-
-      const scale =
-        distance*.0015;
-
-      const moveRight =
-        Cesium.Cartesian3.multiplyByScalar(
-          camera.rightWC,
-          -dx*scale,
-          new Cesium.Cartesian3()
-        );
-
-      const moveUp =
-        Cesium.Cartesian3.multiplyByScalar(
-          camera.upWC,
-          dy*scale,
-          new Cesium.Cartesian3()
-        );
-
-      Cesium.Cartesian3.add(
-        target,
-        Cesium.Cartesian3.add(
-          moveRight,
-          moveUp,
-          new Cesium.Cartesian3()
-        ),
-        target
-      );
-
-      frame =
-        Cesium.Transforms.eastNorthUpToFixedFrame(
-          target
-        );
-    }
-
-    updateCamera();
-  }
-);
-
-canvas.addEventListener(
-  "pointerup",
-  e => {
-
-    const wasClick =
-      !dragged &&
-      e.button === activeButton;
-
-    activeButton = -1;
-
-    if (
-      wasClick &&
-      e.button === 0
-    ) {
-
-      handleClick(e);
-
-    } else {
-
-      updateHover(e);
-    }
-  }
-);
-
-canvas.addEventListener(
-  "pointercancel",
-  () => {
-
-    activeButton = -1;
-    hideHover();
-  }
-);
-
-canvas.addEventListener(
-  "pointerleave",
-  hideHover
-);
-
-window.addEventListener(
-  "blur",
-  () => {
-
-    activeButton = -1;
-    hideHover();
-  }
-);
+  updateCamera();
+});
+canvas.addEventListener("pointerup", e => {
+  const wasClick = !dragged && e.button === activeButton;
+  activeButton = -1;
+  if (wasClick && e.button === 0) { handleClick(e); } else { updateHover(e); }
+});
+canvas.addEventListener("pointercancel", () => { activeButton = -1; hideHover(); });
+canvas.addEventListener("pointerleave", hideHover);
+window.addEventListener("blur", () => { activeButton = -1; hideHover(); });
+canvas.addEventListener("wheel", e => {
+  e.preventDefault();
+  distance = Cesium.Math.clamp(distance * Math.exp(e.deltaY*.001), minDistance, maxDistance);
+  hideHover(); updateCamera();
+}, { passive:false });
+canvas.addEventListener("contextmenu", e => e.preventDefault());
 
 // ==========================================
-// 17. التقريب والتصغير
+// دمج كود 360 Pannellum
 // ==========================================
+const toursData = {
+    cs: ["https://bti.stu.edu.iq/wp-content/uploads/2026/11/قسم-الحاسوب-والذكاء-الاصطناعي-scaled.jpg"],
+    mech: ["https://bti.stu.edu.iq/wp-content/uploads/2026/11/قسم-التقنيات-الميكانيكية-scaled.jpg","https://bti.stu.edu.iq/wp-content/uploads/2026/11/قسم-التقنيات-الميكانيكية2-scaled.jpg","https://bti.stu.edu.iq/wp-content/uploads/2026/11/قسم-التقنيات-الميكانيكية3-scaled.jpg","https://bti.stu.edu.iq/wp-content/uploads/2026/11/قسم-التقنيات-الميكانيكية4-scaled.jpg","https://bti.stu.edu.iq/wp-content/uploads/2026/11/قسم-التقنيات-الميكانيكية5-scaled.jpg","https://bti.stu.edu.iq/wp-content/uploads/2026/11/قسم-التقنيات-الميكانيكية6-scaled.jpg","https://bti.stu.edu.iq/wp-content/uploads/2026/11/قسم-التقنيات-الميكانيكية7-scaled.jpg","https://bti.stu.edu.iq/wp-content/uploads/2026/11/قسم-التقنيات-الميكانيكية8-scaled.jpg","https://bti.stu.edu.iq/wp-content/uploads/2026/11/قسم-التقنيات-الميكانيكية9-scaled.jpg","https://bti.stu.edu.iq/wp-content/uploads/2026/11/قسم-التقنيات-الميكانيكية10-scaled.jpg","https://bti.stu.edu.iq/wp-content/uploads/2026/11/قسم-التقنيات-الميكانيكية11-scaled.jpg","https://bti.stu.edu.iq/wp-content/uploads/2026/11/قسم-التقنيات-الميكانيكية12-scaled.jpg"],
+    chem: ["https://bti.stu.edu.iq/wp-content/uploads/2026/11/قسمالصناعات-الكيمياوية-scaled.jpg","https://bti.stu.edu.iq/wp-content/uploads/2026/11/قسمالصناعات-الكيمياوية2-scaled.jpg"],
+    elec: ["https://bti.stu.edu.iq/wp-content/uploads/2026/11/0d2e349b-ae86-464d-8622-db3c3e07330e.jpg","https://bti.stu.edu.iq/wp-content/uploads/2026/11/6444a992-09b0-45a4-8fb7-605d5558acb9.jpg","https://bti.stu.edu.iq/wp-content/uploads/2026/11/قسم-التقنيات-الكهربائية-scaled.jpg"],
+    surv: ["https://bti.stu.edu.iq/wp-content/uploads/2026/11/مدخل.jpg","https://bti.stu.edu.iq/wp-content/uploads/2026/11/c95ee44e-29ea-49cd-be66-d93461d49ab9.jpg","https://bti.stu.edu.iq/wp-content/uploads/2026/11/a6e9a16c-edf7-4ea2-9e59-005f2731f3e3.jpg","https://bti.stu.edu.iq/wp-content/uploads/2026/11/471de7df-9baf-4deb-b080-3e7e782ecfd4.jpg","https://bti.stu.edu.iq/wp-content/uploads/2026/11/9dd049dc-2d2a-442a-93f2-49bf8bcc3223.jpg","https://bti.stu.edu.iq/wp-content/uploads/2026/11/9d887b56-f4cf-41a2-8f74-a7df02335b5b.jpg","https://bti.stu.edu.iq/wp-content/uploads/2026/11/1a95ffce-3d75-4e03-9aa1-9ef41c511052.jpg"],
+    deanship: ["https://bti.stu.edu.iq/wp-content/uploads/2026/11/72e805fc-4acc-4b05-a83a-f5f54e46ef06.jpg","https://bti.stu.edu.iq/wp-content/uploads/2026/11/2-2.jpeg","https://bti.stu.edu.iq/wp-content/uploads/2026/11/3.jpeg","https://bti.stu.edu.iq/wp-content/uploads/2026/11/4.jpeg","https://bti.stu.edu.iq/wp-content/uploads/2026/11/5.jpeg","https://bti.stu.edu.iq/wp-content/uploads/2026/11/6.jpeg"]
+};
 
-canvas.addEventListener(
-  "wheel",
-  e => {
+const modal = document.getElementById("modal360");
+const closeBtn = document.getElementById("closeModal");
+const modalTitle = document.getElementById("modalTitle");
+let viewerInstance = null;
+let currentSceneIds = [];
+let currentSceneIndex = 0;
+const fixedNav = document.getElementById("fixedNav");
+const btnNext = document.getElementById("btnNext");
+const btnPrev = document.getElementById("btnPrev");
 
-    e.preventDefault();
+window.open360 = function(tourId, buildingName) {
+    if (!toursData[tourId]) return;
+    modal.classList.add("is-active");
+    modalTitle.textContent = buildingName || "جولة 360";
+    if (viewerInstance) { viewerInstance.destroy(); viewerInstance = null; }
+    document.getElementById("panorama-container").innerHTML = "";
+    
+    let images = toursData[tourId].map(url => "https://wsrv.nl/?url=" + url);
+    fixedNav.style.display = images.length > 1 ? "flex" : "none";
 
-    distance =
-      Cesium.Math.clamp(
-        distance *
-        Math.exp(
-          e.deltaY*.001
-        ),
-        minDistance,
-        maxDistance
-      );
+    currentSceneIds = [];
+    const scenes = {};
 
-    hideHover();
-    updateCamera();
-  },
-  {
-    passive:false
-  }
-);
+    images.forEach((url, index) => {
+        const sceneId = 'scene-' + index;
+        currentSceneIds.push(sceneId);
+        scenes[sceneId] = { "title": (buildingName || "جولة") + " - " + (index + 1), "panorama": url };
 
-canvas.addEventListener(
-  "contextmenu",
-  e => e.preventDefault()
-);
+        if (tourId === "deanship" && index === 0) {
+            scenes[sceneId].hotSpots = [{
+                "pitch": -5, "yaw": -18, "type": "scene", "text": "الدخول للمبنى", "sceneId": "scene-1",
+                "cssClass": "custom-hotspot next", "createTooltipFunc": createHotspotNext, "createTooltipArgs": "الدخول للمبنى"
+            }];
+        }
+    });
+
+    currentSceneIndex = 0;
+    
+    setTimeout(function() {
+        if (images.length > 1) {
+            viewerInstance = pannellum.viewer('panorama-container', {
+                "default": { "firstScene": "scene-0", "autoLoad": true, "showControls": false, "compass": false, "sceneFadeDuration": 0, "hfov": 120 },
+                "scenes": scenes
+            });
+
+            const panoContainer = document.getElementById('panorama-container');
+            const originalLoadScene = viewerInstance.loadScene.bind(viewerInstance);
+            
+            viewerInstance.loadScene = function(sceneId) {
+                panoContainer.style.transition = 'transform 0.4s ease-in, opacity 0.4s ease-in';
+                panoContainer.style.transform = 'scale(1.8)';
+                panoContainer.style.opacity = '0.3';
+
+                setTimeout(function() {
+                    originalLoadScene(sceneId);
+                    setTimeout(function() {
+                        panoContainer.style.transition = 'transform 0.4s ease-out, opacity 0.4s ease-out';
+                        panoContainer.style.transform = 'scale(1)';
+                        panoContainer.style.opacity = '1';
+                    }, 50);
+                }, 400);
+            };
+
+            viewerInstance.on('load', function() {
+                const currentScene = viewerInstance.getScene();
+                currentSceneIndex = currentSceneIds.indexOf(currentScene);
+                updateButtons();
+            });
+        } else {
+            viewerInstance = pannellum.viewer('panorama-container', {
+                "type": "equirectangular", "panorama": images[0], "autoLoad": true, "showControls": false, "compass": false, "sceneFadeDuration": 0, "hfov": 120
+            });
+        }
+    }, 100);
+};
+
+function createHotspotNext(hotSpotDiv, args) {
+    hotSpotDiv.innerHTML = '<svg viewBox="0 0 24 24" style="width:100%;height:100%;stroke:#fff;fill:none;stroke-width:2.5;"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>';
+}
+
+function updateButtons() {
+    if (currentSceneIndex <= 0) { btnPrev.style.display = "none"; } else { btnPrev.style.display = "flex"; }
+    if (currentSceneIndex >= currentSceneIds.length - 1) { btnNext.style.display = "none"; } else { btnNext.style.display = "flex"; }
+}
+
+function goToScene(nextIndex) {
+    if (nextIndex < 0 || nextIndex >= currentSceneIds.length) return;
+    viewerInstance.loadScene(currentSceneIds[nextIndex]);
+}
+
+btnNext.addEventListener("click", function() { if (currentSceneIndex < currentSceneIds.length - 1) { goToScene(currentSceneIndex + 1); } });
+btnPrev.addEventListener("click", function() { if (currentSceneIndex > 0) { goToScene(currentSceneIndex - 1); } });
+
+function close360() {
+    modal.classList.remove("is-active");
+    if (viewerInstance) { viewerInstance.destroy(); viewerInstance = null; }
+}
+
+closeBtn.addEventListener("click", close360);
+modal.addEventListener("click", function(e) { if (e.target === modal) close360(); });
+document.addEventListener("keydown", function(e) { if (e.key === "Escape" && modal.classList.contains("is-active")) close360(); });
 
 })().catch(error => {
-
   console.error(error);
-
-  const status =
-    document.getElementById(
-      "status"
-    );
-
-  status.textContent =
-    "حدث خطأ أثناء تشغيل الجولة:\n" +
-    error.message;
-
+  const status = document.getElementById("status");
+  status.textContent = "حدث خطأ أثناء تشغيل الجولة:\n" + error.message;
   status.style.display = "block";
 });
 </script>
-
 </body>
 </html>
